@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Load .env file
+if [ -f .env ]; then
+    export $(cat .env | sed 's/#.*//g' | xargs)
+fi
+
 # Configure your default username and email if not already done
 git config --global user.name "Akash Singh"
 git config --global user.email "akashsunilsingh5555@gmail.com"
