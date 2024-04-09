@@ -15,12 +15,35 @@ echo "Enter commit message:"
 read commitMessage
 git commit -m "$commitMessage"
 
-# This section is commented out since the repository is assumed to already exist
-# echo "Creating a new repository on GitHub..."
-# gh repo create YOUR_USERNAME/REPO_NAME --private --source=.
-
-# Replace 'your_remote_repo_url' with the actual URL of your GitHub repository
-git remote add origin https://github.com/AK2k30/git_automation_workflow.git
+# Check if the remote 'origin' already exists
+if git remote get-url origin > /dev/null 2>&1; then
+    echo "Remote 'origin' already exists. Using existing repository..."
+    repoURL=$(git remote get-url origin)
+else
+    # Prompt for the user's choice to create a new repository
+    echo "Do you want to create a new GitHub repository? (y/n):"
+    read createRepoChoice
+    
+    if [ "$createRepoChoice" = "y" ]; then
+        # Prompt for new repository details
+        echo "Enter your GitHub username:"
+        read githubUsername
+        echo "Enter your new GitHub repository name:"
+        read repoName
+        
+        # Create a new repository using GitHub CLI
+        # Ensure gh is logged in and configured beforehand
+        gh repo create $githubUsername/$repoName --public --source=. --confirm
+        repoURL="https://github.com/$githubUsername/$repoName.git"
+    else
+        # Prompt for the GitHub repository URL
+        echo "Enter your GitHub repository URL (e.g., https://github.com/AK2k30/git_automation_workflow.git):"
+        read repoURL
+        
+        # Add remote repository URL
+        git remote add origin $repoURL
+    fi
+fi
 
 # Determine the current branch (Git 2.22 and above)
 currentBranch=$(git branch --show-current)
